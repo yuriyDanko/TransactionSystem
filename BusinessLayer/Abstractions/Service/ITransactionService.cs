@@ -11,7 +11,7 @@ namespace BusinessLayer.Abstractions.Service
     {
         Task<ICollection<Transaction>> LoadAllAsync();
         Task CreateAsync(Transaction transaction);
-        Task AddListOfTransactionsToSystem(IList<Transaction> transactions);
+        Task AddListOfTransactionsToSystem(ICollection<Transaction> transactions);
         Task UpdateAsync(Transaction transaction);
         Task DeleteAsync(Transaction entity);
     }

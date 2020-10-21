@@ -33,6 +33,7 @@ namespace TransactionSystemWebAPI
             services.AddDbContext<DatabaseContext>(opts => opts.UseSqlServer(Configuration.GetConnectionString("sqlConnection"), b => b.MigrationsAssembly("DataLayer")));
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<ICsvService, CsvService>();
             services.AddControllers();
         }
 

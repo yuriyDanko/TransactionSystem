@@ -1,4 +1,4 @@
-﻿using BusinessLayer.Abstractions.Entities;
+﻿using DataLayer.Abstractions.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;

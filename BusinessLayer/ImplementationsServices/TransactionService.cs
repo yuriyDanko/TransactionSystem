@@ -20,7 +20,7 @@ namespace BusinessLayer.ImplementationsServices
         {
             _transactionRepository = transactionRepository;
         }
-        public async Task AddListOfTransactionsToSystem(IList<Transaction> transactions)
+        public async Task AddListOfTransactionsToSystem(ICollection<Transaction> transactions)
         {
             foreach(var transaction in transactions)
             {
