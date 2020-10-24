@@ -16,5 +16,6 @@ namespace DataLayer.Abstractions.Repositories
         Task UpdateAsync(T entity);
         Task DeleteAsync(T entity);
         Task SaveChangesAsync();
+        Task<T> GetById(int id);
     }
 }

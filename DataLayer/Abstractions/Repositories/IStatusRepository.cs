@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace DataLayer.Abstractions.Repositories
 {
-    public interface ITransactionRepository : IRepository<Transaction>
+    public interface IStatusRepository : IRepository<Status>
     {
-        int GetCountOfRecords();
-        Task<Transaction> GetByTransactionId(int id);
+        Task<bool> IsExist(string statusName);
+        Task<Status> GetByName(string statusName);
     }
 }

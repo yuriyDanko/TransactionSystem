@@ -3,12 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Type = DataLayer.Models.Type;
 
 namespace DataLayer.Abstractions.Repositories
 {
-    public interface ITransactionRepository : IRepository<Transaction>
+    public interface ITypeRepository : IRepository<Type>
     {
-        int GetCountOfRecords();
-        Task<Transaction> GetByTransactionId(int id);
+        Task<bool> IsExist(string typeName);
+        Task<Type> GetByName(string typeName);
+
     }
 }

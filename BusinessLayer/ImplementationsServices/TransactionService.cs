@@ -26,16 +26,28 @@ namespace BusinessLayer.ImplementationsServices
             {
                 await CreateAsync(transaction);
             }
-        }
 
+
+        }
         public async Task CreateAsync(Transaction transaction)
         {
-            await _transactionRepository.CreateAsync(ConvertTransactionFromBLToDL(transaction));
+            var en = ConvertTransactionFromBLToDL(transaction);
+            await _transactionRepository.CreateAsync(en);
         }
 
         public async Task DeleteAsync(Transaction transaction)
         {
             await _transactionRepository.DeleteAsync(ConvertTransactionFromBLToDL(transaction));
+        }
+
+        public async Task<Transaction> GetByTransactionId(int id)
+        {
+            return ConvertTransactionFromDLToBL(await _transactionRepository.GetByTransactionId(id));
+        }
+
+        public int GetCountTransactions()
+        {
+            return _transactionRepository.GetCountOfRecords();
         }
 
         public async Task<ICollection<Transaction>> LoadAllAsync()
@@ -57,23 +69,10 @@ namespace BusinessLayer.ImplementationsServices
         private DataLayer.Models.Transaction ConvertTransactionFromBLToDL(Transaction transaction)
         {
             var transactionDataLayer = new DataLayer.Models.Transaction();
-            transactionDataLayer.Id = transaction.Id;
-            transactionDataLayer.Client = new DataLayer.Models.Client()
-            {
-                Id = transaction.Client.Id,
-                Name = transaction.Client.Name,
-                Surname = transaction.Client.Surname
-            };
-            transactionDataLayer.Type = new DataLayer.Models.Type()
-            {
-                Id = transaction.Type.Id,
-                Name = transaction.Type.Name
-            };
-            transactionDataLayer.Status = new DataLayer.Models.Status()
-            {
-                Id = transaction.Status.Id,
-                Name = transaction.Status.Name
-            };
+            transactionDataLayer.TransactionId = transaction.TransactionId;
+            transactionDataLayer.ClientId = transaction.Client.Id;
+            transactionDataLayer.StatusId = transaction.Status.Id;
+            transactionDataLayer.TypeId = transaction.Type.Id;
             transactionDataLayer.Amount = transaction.Amount;
             return transactionDataLayer;
         }
@@ -81,23 +80,10 @@ namespace BusinessLayer.ImplementationsServices
         private Transaction ConvertTransactionFromDLToBL(DataLayer.Models.Transaction transaction)
         {
             var transactionBusinessLayer = new Transaction();
-            transactionBusinessLayer.Id = transaction.Id;
-            transactionBusinessLayer.Client = new Client()
-            {
-                Id = transaction.Client.Id,
-                Name = transaction.Client.Name,
-                Surname = transaction.Client.Surname
-            };
-            transactionBusinessLayer.Type = new Type()
-            {
-                Id = transaction.Type.Id,
-                Name = transaction.Type.Name
-            };
-            transactionBusinessLayer.Status = new Status()
-            {
-                Id = transaction.Status.Id,
-                Name = transaction.Status.Name
-            };
+            transactionBusinessLayer.TransactionId = transaction.TransactionId;
+            transactionBusinessLayer.ClientId = transaction.ClientId;
+            transactionBusinessLayer.TypeId = transaction.TypeId;
+            transactionBusinessLayer.StatusId = transaction.StatusId;
             transactionBusinessLayer.Amount = transaction.Amount;
             return transactionBusinessLayer;
         }

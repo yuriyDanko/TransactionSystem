@@ -14,5 +14,7 @@ namespace BusinessLayer.Abstractions.Service
         Task AddListOfTransactionsToSystem(ICollection<Transaction> transactions);
         Task UpdateAsync(Transaction transaction);
         Task DeleteAsync(Transaction entity);
+        Task<Transaction> GetByTransactionId(int id);
+        int GetCountTransactions();
     }
 }

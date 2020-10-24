@@ -1,6 +1,7 @@
 ﻿using DataLayer.Abstractions.Entities;
 using DataLayer.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,6 +45,11 @@ namespace DataLayer.Abstractions.Repositories
         public async Task SaveChangesAsync()
         {
             await DbContext.SaveChangesAsync();
+        }
+
+        public async Task<T> GetById(int id)
+        {
+            return await DbContext.Set<T>().FirstOrDefaultAsync(e => e.Id == id);
         }
     }
 }

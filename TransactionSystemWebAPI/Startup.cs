@@ -32,9 +32,16 @@ namespace TransactionSystemWebAPI
         {
             services.AddDbContext<DatabaseContext>(opts => opts.UseSqlServer(Configuration.GetConnectionString("sqlConnection"), b => b.MigrationsAssembly("DataLayer")));
             services.AddScoped<ITransactionRepository, TransactionRepository>();
+            services.AddScoped<IClientRepository, ClientRepository>();
+            services.AddScoped<ITypeRepository, TypeRepository>();
+            services.AddScoped<IStatusRepository, StatusRepository>();
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<ICsvService, CsvService>();
+            services.AddScoped<IClientService, ClientService>();
+            services.AddScoped<IStatusService, StatusService>();
+            services.AddScoped<ITypeService, TypeService>();
             services.AddControllers();
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,7 +51,11 @@ namespace TransactionSystemWebAPI
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
             app.UseRouting();
 
             app.UseAuthorization();
