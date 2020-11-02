@@ -17,7 +17,7 @@ namespace DataLayer.Implementations
 
         public async Task<Transaction> GetByTransactionId(int id)
         {
-            return await DbContext.Set<Transaction>().FirstOrDefaultAsync(t => t.TransactionId == id);
+            return await DbContext.Set<Transaction>().AsNoTracking().FirstOrDefaultAsync(t => t.TransactionId == id);
         }
 
         public int GetCountOfRecords()

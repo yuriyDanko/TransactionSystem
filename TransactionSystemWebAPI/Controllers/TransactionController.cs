@@ -33,6 +33,41 @@ namespace TransactionSystemWebAPI.Controllers
             _csvService = csvService;
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<TransactionViewModelResult>> GetById(int id)
+        {
+            var transaction = await _transactionService.GetByTransactionId(id);
+            return Ok(new TransactionViewModelResult()
+            {
+                TransactionId = transaction.TransactionId,
+                ClientName = (await _clientService.GetById(transaction.ClientId)).Name,
+                ClientSurname = (await _clientService.GetById(transaction.ClientId)).Surname,
+                StatusName = (await _statusService.GetById(transaction.StatusId)).Name,
+                TypeName = (await _typeService.GetById(transaction.TypeId)).Name,
+                Amount = transaction.Amount
+            });
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<ICollection<TransactionViewModelResult>>> GetAll()
+        {
+            var transactions = await _transactionService.LoadAllAsync();
+            var transactionsViewModelResult = new Collection<TransactionViewModelResult>();
+            foreach(var transaction in transactions)
+            {
+                transactionsViewModelResult.Add(new TransactionViewModelResult()
+                {
+                    TransactionId = transaction.TransactionId,
+                    ClientName = (await _clientService.GetById(transaction.ClientId)).Name,
+                    ClientSurname = (await _clientService.GetById(transaction.ClientId)).Surname,
+                    StatusName = (await _statusService.GetById(transaction.StatusId)).Name,
+                    TypeName = (await _typeService.GetById(transaction.TypeId)).Name,
+                    Amount = transaction.Amount
+                });
+            }
+            return Ok(transactionsViewModelResult);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] TransactionViewModel transactionViewModel)
         {
@@ -57,7 +92,7 @@ namespace TransactionSystemWebAPI.Controllers
             return StatusCode(201);
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var transaction = await _transactionService.GetByTransactionId(id);
@@ -65,13 +100,11 @@ namespace TransactionSystemWebAPI.Controllers
             return Ok();
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, TransactionViewModel transactionViewModel)
         {
             var transaction = await _transactionService.GetByTransactionId(id);
             transaction.StatusId = transactionViewModel.StatusId;
-            transaction.TypeId = transactionViewModel.TypeId;
-            transaction.Amount = transactionViewModel.Amount;
             await _transactionService.UpdateAsync(transaction);
             return Ok();
         }

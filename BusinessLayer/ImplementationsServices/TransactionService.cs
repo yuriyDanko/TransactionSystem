@@ -69,10 +69,11 @@ namespace BusinessLayer.ImplementationsServices
         private DataLayer.Models.Transaction ConvertTransactionFromBLToDL(Transaction transaction)
         {
             var transactionDataLayer = new DataLayer.Models.Transaction();
+            transactionDataLayer.Id = transaction.Id;
             transactionDataLayer.TransactionId = transaction.TransactionId;
-            transactionDataLayer.ClientId = transaction.Client.Id;
-            transactionDataLayer.StatusId = transaction.Status.Id;
-            transactionDataLayer.TypeId = transaction.Type.Id;
+            transactionDataLayer.ClientId = transaction.ClientId;
+            transactionDataLayer.StatusId = transaction.StatusId;
+            transactionDataLayer.TypeId = transaction.TypeId;
             transactionDataLayer.Amount = transaction.Amount;
             return transactionDataLayer;
         }
@@ -80,6 +81,7 @@ namespace BusinessLayer.ImplementationsServices
         private Transaction ConvertTransactionFromDLToBL(DataLayer.Models.Transaction transaction)
         {
             var transactionBusinessLayer = new Transaction();
+            transactionBusinessLayer.Id = transaction.Id;
             transactionBusinessLayer.TransactionId = transaction.TransactionId;
             transactionBusinessLayer.ClientId = transaction.ClientId;
             transactionBusinessLayer.TypeId = transaction.TypeId;

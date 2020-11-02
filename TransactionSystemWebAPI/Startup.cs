@@ -31,6 +31,13 @@ namespace TransactionSystemWebAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DatabaseContext>(opts => opts.UseSqlServer(Configuration.GetConnectionString("sqlConnection"), b => b.MigrationsAssembly("DataLayer")));
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+            });
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IClientRepository, ClientRepository>();
             services.AddScoped<ITypeRepository, TypeRepository>();
@@ -51,6 +58,7 @@ namespace TransactionSystemWebAPI
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseCors("CorsPolicy");
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
