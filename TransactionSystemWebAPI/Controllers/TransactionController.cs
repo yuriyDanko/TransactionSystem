@@ -8,9 +8,11 @@ using System.IO;
 using System.Collections.ObjectModel;
 using BusinessLayer.Models;
 using ClosedXML.Excel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TransactionSystemWebAPI.Controllers
 {
+    [Authorize]
     [Route("api/transactions")]
 
     public class TransactionController : Controller
