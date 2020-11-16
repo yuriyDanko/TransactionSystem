@@ -42,6 +42,11 @@ namespace BusinessLayer.ImplementationsServices
 
         public async Task<Transaction> GetByTransactionId(int id)
         {
+            var transaction = await _transactionRepository.GetByTransactionId(id);
+            if(transaction == null)
+            {
+                throw new Exception($"Transaction with id: {id} not found");
+            }
             return ConvertTransactionFromDLToBL(await _transactionRepository.GetByTransactionId(id));
         }
 
