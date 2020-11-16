@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BusinessLayer.Abstractions.Service;
+using BusinessLayer.Extensions;
 using BusinessLayer.ImplementationsServices;
 using DataLayer.Abstractions.Repositories;
+using DataLayer.Extensions;
 using DataLayer.Implementations;
 using DataLayer.Models;
 using Microsoft.AspNetCore.Builder;
@@ -15,6 +18,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NLog;
+using TransactionSystemWebAPI.Extensions;
+using TransactionSystemWebAPI.LoggerService;
 
 namespace TransactionSystemWebAPI
 {
@@ -22,6 +28,7 @@ namespace TransactionSystemWebAPI
     {
         public Startup(IConfiguration configuration)
         {
+            LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
             Configuration = configuration;
         }
 
@@ -38,15 +45,9 @@ namespace TransactionSystemWebAPI
                         .AllowAnyMethod()
                         .AllowAnyHeader());
             });
-            services.AddScoped<ITransactionRepository, TransactionRepository>();
-            services.AddScoped<IClientRepository, ClientRepository>();
-            services.AddScoped<ITypeRepository, TypeRepository>();
-            services.AddScoped<IStatusRepository, StatusRepository>();
-            services.AddScoped<ITransactionService, TransactionService>();
-            services.AddScoped<ICsvService, CsvService>();
-            services.AddScoped<IClientService, ClientService>();
-            services.AddScoped<IStatusService, StatusService>();
-            services.AddScoped<ITypeService, TypeService>();
+            services.AddSingleton<ILoggerManager, LoggerManager>();
+            services.AddRepositoryConfig();
+            services.AddServiceConfig();
             services.AddControllers();
             services.AddSwaggerGen();
         }
@@ -64,6 +65,7 @@ namespace TransactionSystemWebAPI
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
+            app.ConfigureCustomExceptionMiddleware();
             app.UseRouting();
 
             app.UseAuthorization();

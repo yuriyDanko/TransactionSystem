@@ -1,21 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BusinessLayer.Abstractions.Service;
 using TransactionSystemWebAPI.ViewModel;
 using System.IO;
 using System.Collections.ObjectModel;
 using BusinessLayer.Models;
-using System.Reflection.Metadata.Ecma335;
 using ClosedXML.Excel;
 
 namespace TransactionSystemWebAPI.Controllers
 {
     [Route("api/transactions")]
-    
+
     public class TransactionController : Controller
     {
         private readonly ITransactionService _transactionService;
@@ -23,14 +20,16 @@ namespace TransactionSystemWebAPI.Controllers
         private readonly ITypeService _typeService;
         private readonly IStatusService _statusService;
         private readonly ICsvService _csvService;
+        private readonly IExcelService _excelService;
         public TransactionController(ITransactionService transactionService, ICsvService csvService,
-            IClientService clientService, IStatusService statusService, ITypeService typeService)
+            IExcelService excelService, IClientService clientService, IStatusService statusService, ITypeService typeService)
         {
             _transactionService = transactionService;
             _clientService = clientService;
             _statusService = statusService;
             _typeService = typeService;
             _csvService = csvService;
+            _excelService = excelService;
         }
 
         [HttpGet("{id}")]
@@ -53,7 +52,7 @@ namespace TransactionSystemWebAPI.Controllers
         {
             var transactions = await _transactionService.LoadAllAsync();
             var transactionsViewModelResult = new Collection<TransactionViewModelResult>();
-            foreach(var transaction in transactions)
+            foreach (var transaction in transactions)
             {
                 transactionsViewModelResult.Add(new TransactionViewModelResult()
                 {
@@ -71,7 +70,7 @@ namespace TransactionSystemWebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] TransactionViewModel transactionViewModel)
         {
-            if(await _statusService.GetById(transactionViewModel.StatusId) == null)
+            if (await _statusService.GetById(transactionViewModel.StatusId) == null)
             {
                 return BadRequest("Invalid status name");
             }
@@ -103,14 +102,15 @@ namespace TransactionSystemWebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, TransactionViewModel transactionViewModel)
         {
-            var transaction = await _transactionService.GetByTransactionId(id);
+            Transaction transaction = null;
+            transaction = await _transactionService.GetByTransactionId(id);
             transaction.StatusId = transactionViewModel.StatusId;
             await _transactionService.UpdateAsync(transaction);
             return Ok();
         }
 
         [HttpPost("import")]
-        public async Task<IActionResult> ImportCsv([FromForm]CsvFileViewModel csvFileViewModel)
+        public async Task<IActionResult> ImportCsv([FromForm] CsvFileViewModel csvFileViewModel)
         {
             if (csvFileViewModel.FormFile != null)
             {
@@ -126,7 +126,7 @@ namespace TransactionSystemWebAPI.Controllers
 
                     ICollection<Transaction> transactions = await _csvService.Parse(csvFileViewModel.FormFile.OpenReadStream());
                     await _transactionService.AddListOfTransactionsToSystem(transactions);
-                    
+
                     return Ok();
                 }
                 catch (Exception ex)
@@ -138,44 +138,19 @@ namespace TransactionSystemWebAPI.Controllers
             {
                 return BadRequest("Please select the file first to upload.");
             }
-           
+
         }
 
         [HttpGet("export")]
         public async Task<IActionResult> ExportExcel()
         {
             var transactions = await _transactionService.LoadAllAsync();
-            using (var workbook = new XLWorkbook())
-            {
-                var worksheet = workbook.Worksheets.Add("Transactions");
-                var currentRow = 1;
-                worksheet.Cell(currentRow, 1).Value = "TransactionId";
-                worksheet.Cell(currentRow, 2).Value = "Status";
-                worksheet.Cell(currentRow, 3).Value = "Type";
-                worksheet.Cell(currentRow, 4).Value = "ClientName";
-                worksheet.Cell(currentRow, 2).Value = "Amount";
-                foreach (var transaction in transactions)
-                {
-                    currentRow++;
-                    worksheet.Cell(currentRow, 1).Value = transaction.TransactionId;
-                    worksheet.Cell(currentRow, 2).Value = (await _statusService.GetById(transaction.StatusId)).Name;
-                    worksheet.Cell(currentRow, 3).Value = (await _typeService.GetById(transaction.TypeId)).Name;
-                    worksheet.Cell(currentRow, 4).Value = (await _clientService.GetById(transaction.ClientId)).Name + " " +
-                        (await _clientService.GetById(transaction.ClientId)).Surname; 
-                    worksheet.Cell(currentRow, 5).Value = "$" + " " + transaction.Amount.ToString();
-                }
-
-                using (var stream = new MemoryStream())
-                {
-                    workbook.SaveAs(stream);
-                    var content = stream.ToArray();
-
-                    return File(
-                        content,
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        "transactions.xlsx");
-                }
-            }
+            var content = await _excelService.BuildContentForExcelFile(transactions);
+            return File(
+                content,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "transactions.xlsx");
         }
+    
     }
 }
