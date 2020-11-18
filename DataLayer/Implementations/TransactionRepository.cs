@@ -1,6 +1,8 @@
 ﻿using DataLayer.Abstractions.Repositories;
-using DataLayer.Models;
+using DataLayer.Contexts;
+using Entities.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,14 +14,20 @@ namespace DataLayer.Implementations
         {
         }
 
+        public async Task AddTransactions(ICollection<Transaction> transactions)
+        {
+            await DbSet.AddRangeAsync(transactions);
+            await SaveChangesAsync();
+        }
+
         public async Task<Transaction> GetByTransactionId(int id)
         {
-            return await DbContext.Set<Transaction>().AsNoTracking().FirstOrDefaultAsync(t => t.TransactionId == id);
+            return await DbSet.FirstOrDefaultAsync(t => t.TransactionId == id);
         }
 
         public int GetCountOfRecords()
         {
-            return DbContext.Set<Transaction>().Count();
+            return DbSet.Count();
         }
     }
 }

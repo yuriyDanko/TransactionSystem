@@ -1,12 +1,10 @@
-﻿using DataLayer.Abstractions.Entities;
-using DataLayer.Models;
+﻿using DataLayer.Contexts;
+using Entities.Abstractions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataLayer.Abstractions.Repositories
@@ -14,31 +12,33 @@ namespace DataLayer.Abstractions.Repositories
     public abstract class RepositoryBase<T> : IRepository<T> where T : class, IEntity
     {
         protected DatabaseContext DbContext { get; set; }
+        protected DbSet<T> DbSet { get; set; }
         public RepositoryBase(DatabaseContext dbContext)
         {
             this.DbContext = dbContext;
+            DbSet = this.DbContext.Set<T>();
         }
         public async Task<ICollection<T>> FindAllAsync()
         {
-            return await Task.FromResult(this.DbContext.Set<T>().AsNoTracking().ToList());
+            return await Task.FromResult(DbSet.ToList());
         }
         public async Task<IQueryable<T>> FindByConditionAsync(Expression<Func<T, bool>> expression)
         {
-            return await Task.FromResult(this.DbContext.Set<T>().Where(expression).AsNoTracking());
+            return await Task.FromResult(result: DbSet.Where(expression).AsNoTracking());
         }
         public async Task CreateAsync(T entity)
         {
-            await this.DbContext.Set<T>().AddAsync(entity);
+            await DbSet.AddAsync(entity);
             await SaveChangesAsync();
         }
         public async Task UpdateAsync(T entity)
         {
-            this.DbContext.Set<T>().Update(entity);
+            DbSet.Update(entity);
             await SaveChangesAsync();
         }
         public async Task DeleteAsync(T entity)
         {
-             this.DbContext.Set<T>().Remove(entity);
+             DbSet.Remove(entity);
              await SaveChangesAsync();
         }
 
@@ -49,7 +49,7 @@ namespace DataLayer.Abstractions.Repositories
 
         public async Task<T> GetById(int id)
         {
-            return await DbContext.Set<T>().FirstOrDefaultAsync(e => e.Id == id);
+            return await DbSet.FirstOrDefaultAsync(e => e.Id == id);
         }
     }
 }

@@ -1,36 +1,27 @@
 ﻿using DataLayer.Abstractions.Repositories;
-using DataLayer.Models;
+using DataLayer.Contexts;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Type = DataLayer.Models.Type;
+using Entities.Entities;
+using Type = Entities.Entities.Type;
 
 namespace DataLayer.Implementations
 {
-    public class TypeRepository : RepositoryBase<Models.Type>, ITypeRepository
+    public class TypeRepository : RepositoryBase<Entities.Entities.Type>, ITypeRepository
     {
         public TypeRepository(DatabaseContext dbContext) : base(dbContext)
         {
         }
 
-        public async Task<Type> GetByName(string typeName)
+        public async Task<Entities.Entities.Type> GetByName(string typeName)
         {
-            if (await IsExist(typeName))
-            {
-                return await DbContext.Set<Type>().AsNoTracking().FirstOrDefaultAsync(t => t.Name == typeName);
-            }
-
-            throw new Exception($"Type with name {typeName} not found");
-            
+            return await DbSet.FirstOrDefaultAsync(t => t.Name == typeName);
         }
 
         public async Task<bool> IsExist(string typeName)
         {
-            return await DbContext.Set<Type>().AnyAsync(t => t.Name == typeName);
+            return await DbSet.AnyAsync(t => t.Name == typeName);
         }
     }
 }

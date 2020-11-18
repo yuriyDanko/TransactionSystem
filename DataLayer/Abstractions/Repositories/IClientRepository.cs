@@ -1,4 +1,4 @@
-﻿using DataLayer.Models;
+﻿using Entities.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;

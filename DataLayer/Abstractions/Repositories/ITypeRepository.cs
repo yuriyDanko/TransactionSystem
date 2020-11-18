@@ -1,9 +1,9 @@
-﻿using DataLayer.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Type = DataLayer.Models.Type;
+using Entities.Entities;
+using Type = Entities.Entities.Type;
 
 namespace DataLayer.Abstractions.Repositories
 {

@@ -11,7 +11,6 @@ namespace BusinessLayer.Extensions
     {
         public static IServiceCollection AddServiceConfig(this IServiceCollection services)
         {
-            services.AddScoped<ICsvService, CsvService>();
             services.AddScoped<IExcelService, ExcelService>();
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IClientService, ClientService>();

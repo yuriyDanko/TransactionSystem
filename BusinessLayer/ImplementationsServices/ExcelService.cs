@@ -1,6 +1,6 @@
 ﻿using BusinessLayer.Abstractions.Service;
-using BusinessLayer.Models;
 using ClosedXML.Excel;
+using Entities.Entities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,16 +33,20 @@ namespace BusinessLayer.ImplementationsServices
                 worksheet.Cell(currentRow, 3).Value = "Type";
                 worksheet.Cell(currentRow, 4).Value = "ClientName";
                 worksheet.Cell(currentRow, 5).Value = "Amount";
-                foreach (var transaction in transactions)
-                {
-                    currentRow++;
-                    worksheet.Cell(currentRow, 1).Value = transaction.TransactionId;
-                    worksheet.Cell(currentRow, 2).Value = (await _statusService.GetById(transaction.StatusId)).Name;
-                    worksheet.Cell(currentRow, 3).Value = (await _typeService.GetById(transaction.TypeId)).Name;
-                    worksheet.Cell(currentRow, 4).Value = (await _clientService.GetById(transaction.ClientId)).Name + " " +
-                        (await _clientService.GetById(transaction.ClientId)).Surname;
-                    worksheet.Cell(currentRow, 5).Value = "$" + " " + transaction.Amount.ToString();
-                }
+
+                var t = Task.Run(() => {
+                    foreach (var transaction in transactions)
+                    {
+                        currentRow++;
+                        worksheet.Cell(currentRow, 1).Value = transaction.TransactionId;
+                        worksheet.Cell(currentRow, 2).Value = transaction.Status.Name;
+                        worksheet.Cell(currentRow, 3).Value = transaction.Type.Name;
+                        worksheet.Cell(currentRow, 4).Value = transaction.Client.Name + " " + transaction.Client.Surname;
+                        worksheet.Cell(currentRow, 5).Value = "$" + " " + transaction.Amount.ToString();
+                    }
+                });
+
+                t.Wait();
 
                 using (var stream = new MemoryStream())
                 {

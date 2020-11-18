@@ -1,4 +1,4 @@
-﻿using DataLayer.Models;
+﻿using Entities.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,5 +10,6 @@ namespace DataLayer.Abstractions.Repositories
     {
         int GetCountOfRecords();
         Task<Transaction> GetByTransactionId(int id);
+        Task AddTransactions(ICollection<Transaction> transactions);
     }
 }

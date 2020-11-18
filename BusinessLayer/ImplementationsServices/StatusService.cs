@@ -1,6 +1,6 @@
 ﻿using BusinessLayer.Abstractions.Service;
-using BusinessLayer.Models;
 using DataLayer.Abstractions.Repositories;
+using Entities.Entities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,46 +16,35 @@ namespace BusinessLayer.ImplementationsServices
         {
             _statusRepository = statusRepository;
         }
-        public async Task<ICollection<Models.Status>> GetAll()
+        public async Task<ICollection<Status>> GetAll()
         {
-            var statusDL = await _statusRepository.FindAllAsync();
-            var statusBL = new Collection<Models.Status>();
-            foreach (var status in statusDL)
-            {
-                statusBL.Add(ConvertDLToBL(status));
-            }
-            return statusBL;
+            return await _statusRepository.FindAllAsync();
         }
 
         public async Task<Status> GetById(int id)
         {
-            return ConvertDLToBL(await _statusRepository.GetById(id));
+            var status = await _statusRepository.GetById(id);
+            if (status == null)
+            {
+                throw new Exception($"Status with id: {id} was not found");
+            }
+            return status;
         }
 
         public async Task<Status> GetByName(string statusName)
         {
-            try
+            var status = await _statusRepository.GetByName(statusName);
+            if (status == null)
             {
-                var statusDL = await _statusRepository.GetByName(statusName);
-                return ConvertDLToBL(statusDL);
+                throw new Exception($"Status with name: {statusName} was not found");
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            return status;
         }
 
         public async Task<bool> IsExist(string statusName)
         {
             return await _statusRepository.IsExist(statusName);
         }
-        private Models.Status ConvertDLToBL(DataLayer.Models.Status statusEntityToConvert)
-        {
-            return new Models.Status()
-            {
-                Id = statusEntityToConvert.Id,
-                Name = statusEntityToConvert.Name
-            };
-        }
+       
     }
 }

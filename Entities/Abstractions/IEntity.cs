@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DataLayer.Abstractions.Entities
+namespace Entities.Abstractions
 {
     public interface IEntity
     {

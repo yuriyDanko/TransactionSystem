@@ -9,9 +9,9 @@ using BusinessLayer.Abstractions.Service;
 using BusinessLayer.Extensions;
 using BusinessLayer.ImplementationsServices;
 using DataLayer.Abstractions.Repositories;
+using DataLayer.Contexts;
 using DataLayer.Extensions;
 using DataLayer.Implementations;
-using DataLayer.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -47,8 +47,7 @@ namespace TransactionSystemWebAPI
             services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
-           // services.AddSwaggerGen();
-
+        
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
             services
                 .AddAuthentication(options =>

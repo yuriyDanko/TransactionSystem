@@ -6,13 +6,13 @@ using BusinessLayer.Abstractions.Service;
 using TransactionSystemWebAPI.ViewModel;
 using System.IO;
 using System.Collections.ObjectModel;
-using BusinessLayer.Models;
-using ClosedXML.Excel;
 using Microsoft.AspNetCore.Authorization;
+using Entities.Entities;
+using BusinessLayer.ImplementationsServices;
 
 namespace TransactionSystemWebAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/transactions")]
 
     public class TransactionController : Controller
@@ -21,16 +21,14 @@ namespace TransactionSystemWebAPI.Controllers
         private readonly IClientService _clientService;
         private readonly ITypeService _typeService;
         private readonly IStatusService _statusService;
-        private readonly ICsvService _csvService;
         private readonly IExcelService _excelService;
-        public TransactionController(ITransactionService transactionService, ICsvService csvService,
+        public TransactionController(ITransactionService transactionService,
             IExcelService excelService, IClientService clientService, IStatusService statusService, ITypeService typeService)
         {
             _transactionService = transactionService;
             _clientService = clientService;
             _statusService = statusService;
             _typeService = typeService;
-            _csvService = csvService;
             _excelService = excelService;
         }
 
@@ -59,10 +57,10 @@ namespace TransactionSystemWebAPI.Controllers
                 transactionsViewModelResult.Add(new TransactionViewModelResult()
                 {
                     TransactionId = transaction.TransactionId,
-                    ClientName = (await _clientService.GetById(transaction.ClientId)).Name,
-                    ClientSurname = (await _clientService.GetById(transaction.ClientId)).Surname,
-                    StatusName = (await _statusService.GetById(transaction.StatusId)).Name,
-                    TypeName = (await _typeService.GetById(transaction.TypeId)).Name,
+                    ClientName = transaction.Client?.Name,
+                    ClientSurname = transaction.Client?.Surname,
+                    StatusName = transaction.Status?.Name,
+                    TypeName = transaction.Type?.Name,
                     Amount = transaction.Amount
                 });
             }
@@ -126,7 +124,7 @@ namespace TransactionSystemWebAPI.Controllers
                     }
 
 
-                    ICollection<Transaction> transactions = await _csvService.Parse(csvFileViewModel.FormFile.OpenReadStream());
+                    ICollection<Transaction> transactions = await CsvHelper.Parse(csvFileViewModel.FormFile.OpenReadStream());
                     await _transactionService.AddListOfTransactionsToSystem(transactions);
 
                     return Ok();

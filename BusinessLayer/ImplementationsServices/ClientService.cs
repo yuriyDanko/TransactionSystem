@@ -1,13 +1,11 @@
 ﻿using BusinessLayer.Abstractions.Service;
-using BusinessLayer.Models;
 using DataLayer.Abstractions.Repositories;
-using DataLayer.Models;
+using Entities.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using System.Threading.Tasks;
-using Client = DataLayer.Models.Client;
 
 namespace BusinessLayer.ImplementationsServices
 {
@@ -18,22 +16,19 @@ namespace BusinessLayer.ImplementationsServices
         {
             _clientRepository = clientRepository;
         }
-        public async Task AddClient(Models.Client client)
+        public async Task AddClient(Client client)
         {
-           await  _clientRepository.CreateAsync(ConvertBLToDL(client));
+           await  _clientRepository.CreateAsync(client);
         }
 
-        public async Task<Models.Client> GetByNameAndSurname(string name, string surname)
+        public async Task<Client> GetByNameAndSurname(string name, string surname)
         {
-            try
+            var client = await _clientRepository.GetByNameAndSurname(name, surname);    
+            if (client == null)
             {
-                var clientDL = await _clientRepository.GetByNameAndSurname(name, surname);
-                return ConvertDLToBL(clientDL);
+                throw new Exception($"Client with name: {name} and surname: {surname} was not found");
             }
-            catch(Exception ex)
-            {
-                throw ex;
-            }
+            return client;
         }
 
         public async Task<bool> IsExist(string name, string surname)
@@ -41,38 +36,23 @@ namespace BusinessLayer.ImplementationsServices
             return await _clientRepository.IsExist(name, surname);
         }
 
-        public async Task<Models.Client> CreateIfNotExist(string name, string surname)
+        public async Task<Client> CreateIfNotExist(string name, string surname)
         {
             if(!await IsExist(name, surname))
             {
-                await AddClient(new Models.Client() { Name = name, Surname = surname });
+                await AddClient(new Client() { Name = name, Surname = surname });
             }
             return await GetByNameAndSurname(name, surname);
         }
 
-        public Client ConvertBLToDL(Models.Client clientToConvert)
+        public async Task<Client> GetById(int id)
         {
-            return new Client()
+            var client = await _clientRepository.GetById(id);
+            if(client == null)
             {
-                Id = clientToConvert.Id,
-                Name = clientToConvert.Name,
-                Surname = clientToConvert.Surname
-            };
-        }
-
-        public Models.Client ConvertDLToBL(Client clientToConvert)
-        {
-            return new Models.Client()
-            {
-                Id = clientToConvert.Id,
-                Name = clientToConvert.Name,
-                Surname = clientToConvert.Surname
-            };
-        }
-
-        public async Task<Models.Client> GetById(int id)
-        {
-            return ConvertDLToBL(await _clientRepository.GetById(id));
+                throw new Exception($"Client with id: {id} was not found");
+            }
+            return client;
         }
     }
 }

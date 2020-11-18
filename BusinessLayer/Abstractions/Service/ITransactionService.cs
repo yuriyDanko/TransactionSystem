@@ -1,4 +1,4 @@
-﻿using BusinessLayer.Models;
+﻿using Entities.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +13,7 @@ namespace BusinessLayer.Abstractions.Service
         Task CreateAsync(Transaction transaction);
         Task AddListOfTransactionsToSystem(ICollection<Transaction> transactions);
         Task UpdateAsync(Transaction transaction);
-        Task DeleteAsync(Transaction entity);
+        Task DeleteAsync(Transaction transaction);
         Task<Transaction> GetByTransactionId(int id);
         int GetCountTransactions();
     }

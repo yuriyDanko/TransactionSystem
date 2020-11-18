@@ -1,5 +1,6 @@
 ﻿using DataLayer.Abstractions.Repositories;
-using DataLayer.Models;
+using DataLayer.Contexts;
+using Entities.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -16,17 +17,12 @@ namespace DataLayer.Implementations
 
         public async Task<Status> GetByName(string statusName)
         {
-            if (await IsExist(statusName))
-            {
-                return await DbContext.Set<Status>().AsNoTracking().FirstOrDefaultAsync(t => t.Name == statusName);
-            }
-
-            throw new Exception($"Status with name {statusName} not found"); ;
+           return await DbSet.FirstOrDefaultAsync(t => t.Name == statusName);  
         }
 
         public async Task<bool> IsExist(string statusName)
         {
-           return await DbContext.Set<Status>().AnyAsync(s => s.Name == statusName);
+           return await DbSet.AnyAsync(s => s.Name == statusName);
         }
     }
 }

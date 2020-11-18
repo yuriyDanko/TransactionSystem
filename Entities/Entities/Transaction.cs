@@ -1,10 +1,10 @@
-﻿using BusinessLayer.Abstractions.Entities;
+﻿using Entities.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 
-namespace BusinessLayer.Models
+namespace Entities.Entities
 {
     public class Transaction : IEntity
     {
